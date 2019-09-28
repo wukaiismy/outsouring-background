@@ -1,5 +1,5 @@
 "use strict";
 module.exports = {
   NODE_ENV: '"production"',
-  BASE_API: '"http://47.92.224.218"'
+  BASE_API: '"http://94.191.125.82/yanghua_edu/api"'
 };

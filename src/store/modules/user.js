@@ -34,9 +34,9 @@ const user = {
           .then(response => {
             console.log("+++++++++++");
             console.log(response);
-            const data = response.data;
-            setToken("admin");
-            commit("SET_TOKEN", "admin");
+            const data = response.token;
+            setToken(data);
+            commit("SET_TOKEN", data);
             commit("SET_ROLES", "admin");
 
             resolve();

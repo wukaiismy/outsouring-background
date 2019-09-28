@@ -4,7 +4,7 @@
  * @Github: https://github.com/wukaiismy
  * @since: 2018-11-09 00:29:40
  * @LastAuthor: wukai
- * @lastTime: 2019-07-31 11:28:12
+ * @lastTime: 2019-09-24 21:26:03
  -->
 <template>
   <div class="login-container">
@@ -16,10 +16,10 @@
       auto-complete="on"
       label-position="left"
     >
-      <h3 class="title">信条官网后台</h3>
+      <h3 class="title">扬华教育官网后台</h3>
       <el-form-item prop="username">
         <span class="svg-container">
-          <svg-icon icon-class="user"/>
+          <svg-icon icon-class="user" />
         </span>
         <el-input
           v-model="loginForm.username"
@@ -31,7 +31,7 @@
       </el-form-item>
       <el-form-item prop="password">
         <span class="svg-container">
-          <svg-icon icon-class="password"/>
+          <svg-icon icon-class="password" />
         </span>
         <el-input
           :type="pwdType"
@@ -42,7 +42,7 @@
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon icon-class="eye"/>
+          <svg-icon icon-class="eye" />
         </span>
       </el-form-item>
       <el-form-item>
@@ -56,7 +56,7 @@
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: ·~</span>
         <span>password: admin</span>
-      </div> -->
+      </div>-->
     </el-form>
   </div>
 </template>

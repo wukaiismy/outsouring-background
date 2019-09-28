@@ -1,13 +1,13 @@
 import request from "@/utils/request";
 
-export function login(mobile, password) {
+export function login(name, password) {
   const data = {
-    mobile,
+    name,
     password
   };
   console.log(data);
   return request({
-    url: "/website/backstage/login/",
+    url: "/api/other_module/login/",
     method: "post",
     data
   });

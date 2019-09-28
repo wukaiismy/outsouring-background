@@ -30,11 +30,11 @@ export function showCm(URL) {
     method: "get"
   });
 }
-export function markCm(URL, id) {
+export function markCm(URL, data) {
   return request({
     url: URL,
-    method: "get",
-    params: { id }
+    method: "put",
+    data
   });
 }
 //编辑客户申请记录：（意向）

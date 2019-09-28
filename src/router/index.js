@@ -45,36 +45,63 @@ export const constantRouterMap = [
   },
 
   {
-    path: "/example",
+    path: "/banner",
     component: Layout,
-    redirect: "/example/table",
-    name: "Example",
-    meta: { title: "轮播图添加", icon: "example" },
+    redirect: "/banner/homePage",
+    name: "Banner",
+    meta: { title: "首页模块", icon: "example" },
     children: [
       {
-        path: "table",
-        name: "Table",
-        component: () => import("@/views/table/index"),
-        meta: { title: "首页Banner", icon: "table" }
+        path: "banner",
+        name: "banner",
+        component: () => import("@/views/banner/banner"),
+        meta: { title: "Banner图", icon: "table" }
       },
       {
-        path: "tree",
-        name: "Tree",
-        component: () => import("@/views/tree/index"),
-        meta: { title: "产品中心Banner", icon: "tree" }
+        path: "otherImg",
+        name: "otherImg",
+        component: () => import("@/views/banner/otherImg"),
+        meta: { title: "其他图片", icon: "tree" }
+      },
+      {
+        path: "home-buttom",
+        name: "HomeButtom",
+        component: () => import("@/views/banner/HomeButtom"),
+        meta: { title: "底部内容", icon: "table" }
+      },
+      {
+        path: "company-profile",
+        name: "CompanyProfile",
+        component: () => import("@/views/banner/CompanyProfile"),
+        meta: { title: "公司简介", icon: "tree" }
       }
     ]
   },
 
   {
-    path: "/form",
+    path: "/jion",
     component: Layout,
+    redirect: "/jion/form-list",
+    name: "Banner",
+    meta: { title: "加盟", icon: "example" },
     children: [
       {
-        path: "index",
-        name: "Form",
-        component: () => import("@/views/form/index"),
+        path: "form-list",
+        name: "FormList",
+        component: () => import("@/views/jionUs/JionList"),
         meta: { title: "加盟信息表", icon: "form" }
+      },
+      {
+        path: "applicants",
+        name: "Applicants",
+        component: () => import("@/views/jionUs/Applicants"),
+        meta: { title: "我要报考", icon: "user" }
+      },
+      {
+        path: "online-registration",
+        name: "OnlineRegistration",
+        component: () => import("@/views/jionUs/OnlineRegistration"),
+        meta: { title: "在线报名", icon: "user" }
       }
     ]
   },
@@ -85,7 +112,7 @@ export const constantRouterMap = [
     redirect: "/news/list",
     name: "News",
     meta: {
-      title: "新闻编辑",
+      title: "图文",
       icon: "nested"
     },
     children: [
@@ -93,37 +120,55 @@ export const constantRouterMap = [
         path: "list",
         component: () => import("@/views/news/list/index"), // Parent router-view
         name: "List",
-        meta: { title: "新闻列表" }
+        meta: { title: "图文列表" }
       },
       {
         path: "menu1",
         component: () => import("@/views/news/menu1/index"), // Parent router-view
         name: "Menu1",
-        meta: { title: "新闻添加" }
+        meta: { title: "图文添加" }
       }
     ]
   },
-
   {
-    path: "external-link",
+    path: "/sever",
     component: Layout,
-    name: "Link",
-    meta: {
-      title: "官网外链",
-      icon: "link"
-    },
+    redirect: "/sever/sever-center",
+    name: "Jion",
+    meta: { title: "服务", icon: "example" },
     children: [
       {
-        path: "http://www.ifepay.com",
-        meta: { title: "官网外链", icon: "link" }
+        path: "sever-center",
+        name: "SeverCenter",
+        component: () => import("@/views/severcenter/SeverCenter"),
+        meta: { title: "服务中心", icon: "form" }
       },
       {
-        path: "http://www.ifepay.com/admin",
-        meta: { title: "管理系统", icon: "link" }
+        path: "service-point",
+        name: "ServicePoint",
+        component: () => import("@/views/severcenter/ServicePoint"),
+        meta: { title: "服务点", icon: "user" }
+      }
+    ]
+  },
+  {
+    path: "/learn",
+    component: Layout,
+    redirect: "/learn/LearningCenter",
+    name: "LearningCenter",
+    meta: { title: "学习资料平台", icon: "example" },
+    children: [
+      {
+        path: "learning-center",
+        name: "LearningCenter",
+        component: () => import("@/views/learningcenter/LearningCenter"),
+        meta: { title: "学习中心", icon: "form" }
       },
       {
-        path: "http://www.ifepay.com/merchant",
-        meta: { title: "B端", icon: "link" }
+        path: "data-center",
+        name: "DataCenter",
+        component: () => import("@/views/learningcenter/DataCenter"),
+        meta: { title: "资料下载", icon: "user" }
       }
     ]
   },

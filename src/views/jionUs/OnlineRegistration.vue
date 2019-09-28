@@ -1,6 +1,6 @@
 <template>
   <div id="dalos">
-    <Search @channelSearch="channelSearch"/>
+    <Search @channelSearch="channelSearch" />
     <!-- 我是表格组件 -->
     <div class="bigBoxs">
       <el-table
@@ -13,40 +13,49 @@
         highlight-current-row
         style="width:100%;"
       >
-        <el-table-column property="create_at" label="创建时间" align="center"></el-table-column>
-        <el-table-column property="company_name" label="公司名称" align="center"></el-table-column>
-        <el-table-column property="industry" label="所属行业" align="center"></el-table-column>
-        <el-table-column label="申请类型" align="center" width="100%">
+        <el-table-column property="create_time" label="创建时间" align="center"></el-table-column>
+        <el-table-column property="name" label="名字" align="center"></el-table-column>
+        <el-table-column label="性别" align="center">
           <template slot-scope="scope">
-            <span type="text" size="small" class="shangjia" v-if="scope.row.types_of==1">商户加盟</span>
-            <span type="text" size="small" class="shanchu" v-if="scope.row.types_of==2">渠道商加盟</span>
-            <!-- <span type="text" size="small" class="shanchu" v-if="scope.row.types_of==2">大客户</span> -->
+            <span type="text" size="small">{{scope.row.sex==1?'男':"女"}}</span>
           </template>
         </el-table-column>
-        <el-table-column property="adr" label="公司地址" align="center"></el-table-column>
-        <el-table-column property="contact_user" label="联系人" align="center"></el-table-column>
+        <el-table-column property="id_card_number" label="身份证号" align="center"></el-table-column>
         <el-table-column property="mobile" label="联系电话" align="center"></el-table-column>
-        <el-table-column property="remarks" label="处理情况" align="center"></el-table-column>
+        <el-table-column property="school_or_unit" label="所在单位或学校" align="center"></el-table-column>
+        <el-table-column property="current_position" label="当前职位" align="center"></el-table-column>
+        <el-table-column label="现从事工作" align="center" width="100%">
+          <template slot-scope="scope">
+            <span type="text" size="small">{{scope.row.jobs||'-'}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column property="joining_area" label="需加盟区域" align="center"></el-table-column>
+        <el-table-column label="备注" align="center">
+          <template slot-scope="scope">
+            <span type="text" size="small">{{scope.row.remarks||'-'}}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="状态" align="center" width="100%">
           <template slot-scope="scope">
-            <span type="text" size="small" class="shangjia" v-if="scope.row.is_contact==0">未联系</span>
-            <span type="text" size="small" class="shanchu" v-if="scope.row.is_contact==1">已联系</span>
+            <span type="text" size="small" class="shangjia" v-if="scope.row.is_contact">已联系</span>
+            <span type="text" size="small" class="shanchu" v-else>未联系</span>
             <!-- <span type="text" size="small" class="shanchu" v-if="scope.row.types_of==2">大客户</span> -->
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <!-- <el-button  type="text" size="small" class="xiaz" @click="addSumbit(scope.row)">添加</el-button> -->
-            <el-button type="text" size="small" class="xiaz" @click="edits(scope.row)">编辑</el-button>
-            <el-button type="text" size="small" class="xiaz" @click="handover(scope.row)">标记</el-button>
+            <!-- <el-button type="text" size="small" v-if="scope.row.is_contact">已联系</el-button> -->
+            <el-button
+              type="text"
+              size="small"
+              v-if="!scope.row.is_contact"
+              class="xiaz"
+              @click="handover(scope.row)"
+            >标记</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <!-- 下面的选择按钮 -->
-      <div class="allChose">
-        <el-button class="adds" icon="el-icon-plus" @click="addSumbit">备用按钮</el-button>
-        <!-- <el-button v-waves class="searchs" type="primary"  icon="el-icon-download"  @click="daochuJump">导出</el-button> -->
-      </div>
     </div>
     <!-- 分页功能 -->
     <div class="pagination-container">
@@ -134,7 +143,7 @@ import Search from "./components/Search.vue";
 
 import { showCm, markCm, editCm } from "@/api/news";
 export default {
-  name: "UserAuthorization",
+  name: "OnlineRegistration",
 
   data() {
     return {
@@ -187,7 +196,7 @@ export default {
       this.listLoading = true;
 
       var basicURL =
-        "/website/backstage/show_cm/?page=" +
+        "/api/other_module/join_hand/?page=" +
         this.pages.page +
         "&size=" +
         this.pages.size;
@@ -195,9 +204,7 @@ export default {
         console.log(res);
         var dataList = res.data.ret;
         console.log(dataList);
-        for (var i = 0; i < dataList.length; i++) {
-          dataList[i].create_at = dataList[i].create_at.split("T").join(" ");
-        }
+
         this.total = res.data.count;
         this.gridData = dataList;
       });
@@ -208,7 +215,7 @@ export default {
     // 提示框函数
     message(msg, status) {
       var types = "";
-      if (status == "200") {
+      if (status == "1") {
         types = "success";
       } else {
         types = "error";
@@ -226,15 +233,10 @@ export default {
     },
     // 启用切换
     handover(val) {
-      var detailURL = "";
-      if (val.types_of == "1") {
-        detailURL = "/website/backstage/mark_cm/";
-      } else if (val.types_of == "2") {
-        detailURL = "/website/backstage/mark_cm/";
-      } else if (val.types_of == "0") {
-        detailURL = "/website/backstage/mark_cm/";
-      }
-      markCm(detailURL, val.id).then(res => {
+      var obj = { id: val.id };
+      var detailURL = "/api/other_module/join_hand/";
+
+      markCm(detailURL, obj).then(res => {
         console.log(res);
         this.message(res.msg, res.code);
         this.getList();

@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
-    <div class="title">首页轮播图</div>
+    <div class="title">其他图片增添</div>
     <div class="imgBox" v-for="(item, index) in imgList" :key="index">
-      <img class="imgs" :src="'/website/media/'+item" alt>
+      <img class="imgs" :src="'/website/media/'+item" alt />
       <div class="changeBox">
         <el-upload
           action="/backstage/update_cm/"
@@ -40,7 +40,7 @@ export default {
     fetchData() {
       this.listLoading = true;
       this.imgList = [];
-      getList(1).then(res => {
+      getList(2).then(res => {
         console.log(res);
         var imgLists = res.data.ret[0];
         this.imgList.push(imgLists.img1);
@@ -53,7 +53,8 @@ export default {
     changeImg(ind) {
       var img = "image" + ind;
       var data = {
-        img: this.file
+        img: this.file,
+        id: 2
       };
       if (!this.file) {
         this.$message({
@@ -62,10 +63,10 @@ export default {
         });
         return;
       }
-      var Url = "/website/backstage/update_cm/";
       var param = new FormData();
       param.append(img, this.file);
-      // param.append("id", 1);
+      param.append("id", 2);
+      var Url = "/website/backstage/update_cm2/";
       changeList(Url, param).then(res => {
         console.log(res);
         if (res.code == "200") {
