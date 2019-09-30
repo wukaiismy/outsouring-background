@@ -72,69 +72,6 @@
       />
     </div>
     <!-- 主体内容结束 -->
-    <!-- 下面是编辑模态框 -->
-    <el-dialog :visible.sync="dialogTableVisible2" custom-class="sssss" top="20vh" width="500px">
-      <div class="diaTilte">
-        <div class="titleMotai">处理情况</div>
-        <div class="items">
-          <div class="abs abs1">创建时间：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.create_at"
-            ></el-input>
-          </span>
-        </div>
-        <!-- <div class="items"><div class="abs abs1">员工编号：</div><span><el-input  :disabled="true" size="small"  style="width:46.17%; height:40px;" v-model="msg1.id" ></el-input></span></div>  -->
-        <div class="items">
-          <div class="abs abs1">公司名称：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.company_name"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">联系电话：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.mobile"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">联系人：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.contact_user"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">处理情况：</div>
-          <span>
-            <el-input size="small" style="width:46.17%; height:40px;" v-model="msg1.remarks"></el-input>
-          </span>
-        </div>
-
-        <!-- 下面是按钮 -->
-        <div class="btnBoxs">
-          <el-button class="submmitBtn" @click="submitChange">确定</el-button>
-        </div>
-      </div>
-    </el-dialog>
-    <!-- 编辑模态框结束 -->
   </div>
 </template>
 
@@ -196,7 +133,7 @@ export default {
       this.listLoading = true;
 
       var basicURL =
-        "/api/other_module/join_hand/?page=" +
+        "/yanghua_edu/api/other_module/join_hand/?pg=" +
         this.pages.page +
         "&size=" +
         this.pages.size;
@@ -234,7 +171,7 @@ export default {
     // 启用切换
     handover(val) {
       var obj = { id: val.id };
-      var detailURL = "/api/other_module/join_hand/";
+      var detailURL = "/yanghua_edu/api/other_module/join_hand/";
 
       markCm(detailURL, obj).then(res => {
         console.log(res);
@@ -243,38 +180,8 @@ export default {
       });
     },
 
-    // 新增员工
-    addSumbit(val) {
-      console.log(val);
-      this.dialogTableVisible1 = true;
-    },
-    // 下面是新增员工权限提交按钮
-    submitAdd() {
-      var detailURL = "/backend/api/v1/admin/createadmin/";
-      userAdd(detailURL, this.msg).then(res => {
-        console.log(res);
-        this.dialogTableVisible1 = false;
-        this.message(res.data.msg, res.data.code);
-      });
-    },
-    // 修改
-    submitChange() {
-      var data = {
-        remarks: this.msg1.remarks,
-        id: this.msg1.id
-      };
-      console.log(data);
-      editCm(data).then(res => {
-        console.log(res);
-        if (res.code == "200") {
-          this.message(res.msg, res.code);
-          this.dialogTableVisible2 = false;
-          this.getList();
-        } else {
-          this.message("操作失败！", res.code);
-        }
-      });
-    },
+    
+
     //分页功能选择
     handleSizeChange(val) {
       this.pages.page = 1;

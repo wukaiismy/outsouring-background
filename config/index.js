@@ -10,12 +10,12 @@ module.exports = {
     assetsSubDirectory: "static",
     assetsPublicPath: "/",
     proxyTable: {
-      "/api": {
+      "/yanghua_edu": {
         // 测试环境
-        target: "http://94.191.125.82/yanghua_edu/api", // 接口域名
+        target: "http://94.191.125.82/yanghua_edu", // 接口域名
         changeOrigin: true, //是否跨域
         pathRewrite: {
-          "^/api": "" //需要rewrite重写的,
+          "^/yanghua_edu": "" //需要rewrite重写的,
         }
       }
     },

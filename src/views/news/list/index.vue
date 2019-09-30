@@ -1,6 +1,6 @@
 <template>
   <div id="dalos">
-    <Search @channelSearch="channelSearch"/>
+    <Search @channelSearch="channelSearch" />
     <!-- 我是表格组件 -->
     <div class="bigBoxs">
       <el-table
@@ -13,18 +13,19 @@
         highlight-current-row
         style="width:100%;"
       >
-        <el-table-column property="create_at" label="发布时间" width="160%" align="center"></el-table-column>
-        <el-table-column property="topic" label="新闻标题" align="center"></el-table-column>
-        <el-table-column label="新闻类型" align="center" width="80%">
+        <el-table-column property="create_time" label="发布时间" width="160%" align="center"></el-table-column>
+        <el-table-column property="title" label="标题" align="center"></el-table-column>
+        <el-table-column label="类型" align="center" width="80%">
           <template slot-scope="scope">
-            <span type="text" size="small" class="shangjia" v-if="scope.row.type_of==0">政策法规</span>
-            <span type="text" size="small" class="shanchu" v-if="scope.row.type_of==1">行业新闻</span>
-            <span type="text" size="small" class="shanchu" v-if="scope.row.type_of==2">平台新闻</span>
+            <span type="text" size="small" v-if="scope.row.graphic_type_id==1">行业动态</span>
+            <span type="text" size="small" v-else-if="scope.row.graphic_type_id==2">专业指导</span>
+            <span type="text" size="small" v-else-if="scope.row.graphic_type_id==3">考试攻略</span>
+            <span type="text" size="small" v-else-if="scope.row.graphic_type_id==4">报考指南</span>
           </template>
         </el-table-column>
-        <el-table-column property="summary" label="新闻摘要" align="center"></el-table-column>
-        <el-table-column property="urls" label="新闻来源" width="90%" align="center"></el-table-column>
-        <el-table-column property="author" label="维护人" width="130%" align="center"></el-table-column>
+        <el-table-column property="description" label="新闻摘要" align="center"></el-table-column>
+        <!-- <el-table-column property="urls" label="新闻来源" width="90%" align="center"></el-table-column> -->
+        <el-table-column property="admin_name" label="作者" width="130%" align="center"></el-table-column>
         <el-table-column label="操作" align="center" width="100%">
           <template slot-scope="scope">
             <el-button
@@ -32,7 +33,7 @@
               size="small"
               width="100%"
               class="stopServer"
-              @click="deleted(scope.row)"
+              @click="deleted(scope.row.id)"
             >删除</el-button>
           </template>
         </el-table-column>
@@ -118,17 +119,18 @@ export default {
     getList(data) {
       this.listLoading = true;
       var basicURL =
-        "/website/backstage/new_list/?page=" +
+        "/yanghua_edu/api/graphic_module/graphic/?pg=" +
         this.pages.page +
         "&size=" +
         this.pages.size;
       getList(basicURL).then(res => {
+        console.log("图文");
         console.log(res);
         var dataList = res.data.ret;
         console.log(dataList);
-        for (var i = 0; i < dataList.length; i++) {
-          dataList[i].date = dataList[i].date.split("T").join(" ");
-        }
+        // for (var i = 0; i < dataList.length; i++) {
+        //   dataList[i].date = dataList[i].date.split("T").join(" ");
+        // }
         this.total = res.data.count;
         this.gridData = dataList;
       });
@@ -154,10 +156,13 @@ export default {
     deleted(val) {
       console.log(val);
       console.log("您点击了删除");
-
-      delNews(val.id).then(res => {
+      var data = {
+        id: val
+      };
+      var url = "/yanghua_edu/api/graphic_module/graphic/";
+      delNews(url, data).then(res => {
         console.log(res);
-        if (res.code == "200") {
+        if (res.code == "1") {
           this.message(res.msg, res.code);
           this.getList();
         } else {

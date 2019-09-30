@@ -22,15 +22,15 @@
         </el-table-column>
         <el-table-column property="id_card_number" label="身份证号" align="center"></el-table-column>
         <el-table-column property="mobile" label="联系电话" align="center"></el-table-column>
-        <el-table-column property="school_or_unit" label="所在单位或学校" align="center"></el-table-column>
-        <el-table-column property="current_position" label="当前职位" align="center"></el-table-column>
-        <el-table-column label="现从事工作" align="center" width="100%">
+        <el-table-column property="current_institution" label="就读学校" align="center"></el-table-column>
+        <el-table-column property="need_report_colleges" label="需报院校" align="center"></el-table-column>
+        <el-table-column label="需报专业" align="center" width="100%">
           <template slot-scope="scope">
-            <span type="text" size="small">{{scope.row.jobs||'-'}}</span>
+            <span type="text" size="small">{{scope.row.need_report_professional||'-'}}</span>
           </template>
         </el-table-column>
-        <el-table-column property="joining_area" label="需加盟区域" align="center"></el-table-column>
-        <el-table-column label="备注" align="center">
+        <!-- <el-table-column property="joining_area" label="需加盟区域" align="center"></el-table-column> -->
+        <el-table-column label="补充信息" align="center">
           <template slot-scope="scope">
             <span type="text" size="small">{{scope.row.remarks||'-'}}</span>
           </template>
@@ -72,76 +72,13 @@
       />
     </div>
     <!-- 主体内容结束 -->
-    <!-- 下面是编辑模态框 -->
-    <el-dialog :visible.sync="dialogTableVisible2" custom-class="sssss" top="20vh" width="500px">
-      <div class="diaTilte">
-        <div class="titleMotai">处理情况</div>
-        <div class="items">
-          <div class="abs abs1">创建时间：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.create_at"
-            ></el-input>
-          </span>
-        </div>
-        <!-- <div class="items"><div class="abs abs1">员工编号：</div><span><el-input  :disabled="true" size="small"  style="width:46.17%; height:40px;" v-model="msg1.id" ></el-input></span></div>  -->
-        <div class="items">
-          <div class="abs abs1">公司名称：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.company_name"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">联系电话：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.mobile"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">联系人：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.contact_user"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">处理情况：</div>
-          <span>
-            <el-input size="small" style="width:46.17%; height:40px;" v-model="msg1.remarks"></el-input>
-          </span>
-        </div>
-
-        <!-- 下面是按钮 -->
-        <div class="btnBoxs">
-          <el-button class="submmitBtn" @click="submitChange">确定</el-button>
-        </div>
-      </div>
-    </el-dialog>
-    <!-- 编辑模态框结束 -->
   </div>
 </template>
 
 <script>
 import Search from "./components/Search.vue";
 
-import { showCm, markCm, editCm } from "@/api/news";
+import { showCm, markCm } from "@/api/news";
 export default {
   name: "OnlineRegistration",
 
@@ -158,9 +95,7 @@ export default {
       list: null,
       total: 1,
       listLoading: true,
-      dialogTableVisible: false,
-      dialogTableVisible1: false,
-      dialogTableVisible2: false,
+
       msg: {
         name: "",
         mobile: "",
@@ -196,11 +131,13 @@ export default {
       this.listLoading = true;
 
       var basicURL =
-        "/api/other_module/join_hand/?page=" +
+        "/yanghua_edu/api/other_module/online_sign/?pg=" +
         this.pages.page +
         "&size=" +
         this.pages.size;
       showCm(basicURL).then(res => {
+        console.log("在线报名");
+
         console.log(res);
         var dataList = res.data.ret;
         console.log(dataList);
@@ -225,16 +162,11 @@ export default {
         type: types
       });
     },
-    // 编辑按钮
-    edits(val) {
-      console.log(val);
-      this.dialogTableVisible2 = true;
-      this.msg1 = val;
-    },
+
     // 启用切换
     handover(val) {
       var obj = { id: val.id };
-      var detailURL = "/api/other_module/join_hand/";
+      var detailURL = "/yanghua_edu/api/other_module/join_hand/";
 
       markCm(detailURL, obj).then(res => {
         console.log(res);
@@ -243,38 +175,6 @@ export default {
       });
     },
 
-    // 新增员工
-    addSumbit(val) {
-      console.log(val);
-      this.dialogTableVisible1 = true;
-    },
-    // 下面是新增员工权限提交按钮
-    submitAdd() {
-      var detailURL = "/backend/api/v1/admin/createadmin/";
-      userAdd(detailURL, this.msg).then(res => {
-        console.log(res);
-        this.dialogTableVisible1 = false;
-        this.message(res.data.msg, res.data.code);
-      });
-    },
-    // 修改
-    submitChange() {
-      var data = {
-        remarks: this.msg1.remarks,
-        id: this.msg1.id
-      };
-      console.log(data);
-      editCm(data).then(res => {
-        console.log(res);
-        if (res.code == "200") {
-          this.message(res.msg, res.code);
-          this.dialogTableVisible2 = false;
-          this.getList();
-        } else {
-          this.message("操作失败！", res.code);
-        }
-      });
-    },
     //分页功能选择
     handleSizeChange(val) {
       this.pages.page = 1;

@@ -7,7 +7,7 @@ export function login(name, password) {
   };
   console.log(data);
   return request({
-    url: "/api/other_module/login/",
+    url: "/yanghua_edu/api/other_module/login/",
     method: "post",
     data
   });

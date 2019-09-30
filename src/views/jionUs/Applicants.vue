@@ -14,48 +14,19 @@
         style="width:100%;"
       >
         <el-table-column property="create_time" label="创建时间" align="center"></el-table-column>
-        <el-table-column property="name" label="名字" align="center"></el-table-column>
-        <el-table-column label="性别" align="center">
-          <template slot-scope="scope">
-            <span type="text" size="small">{{scope.row.sex==1?'男':"女"}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column property="id_card_number" label="身份证号" align="center"></el-table-column>
-        <el-table-column property="mobile" label="联系电话" align="center"></el-table-column>
-        <el-table-column property="school_or_unit" label="所在单位或学校" align="center"></el-table-column>
-        <el-table-column property="current_position" label="当前职位" align="center"></el-table-column>
-        <el-table-column label="现从事工作" align="center" width="100%">
-          <template slot-scope="scope">
-            <span type="text" size="small">{{scope.row.jobs||'-'}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column property="joining_area" label="需加盟区域" align="center"></el-table-column>
-        <el-table-column label="备注" align="center">
-          <template slot-scope="scope">
-            <span type="text" size="small">{{scope.row.remarks||'-'}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="状态" align="center" width="100%">
-          <template slot-scope="scope">
-            <span type="text" size="small" class="shangjia" v-if="scope.row.is_contact">已联系</span>
-            <span type="text" size="small" class="shanchu" v-else>未联系</span>
-            <!-- <span type="text" size="small" class="shanchu" v-if="scope.row.types_of==2">大客户</span> -->
-          </template>
-        </el-table-column>
+        <el-table-column property="name" label="项目名字" align="center"></el-table-column>
+
+        <el-table-column property="introduction" label="简介" align="center"></el-table-column>
+        <el-table-column property="content" label="简介" align="center"></el-table-column>
+
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <!-- <el-button  type="text" size="small" class="xiaz" @click="addSumbit(scope.row)">添加</el-button> -->
-            <!-- <el-button type="text" size="small" v-if="scope.row.is_contact">已联系</el-button> -->
-            <el-button
-              type="text"
-              size="small"
-              v-if="!scope.row.is_contact"
-              class="xiaz"
-              @click="handover(scope.row)"
-            >标记</el-button>
+            <el-button type="text" @click="edits(scope.row)">编辑</el-button>
+            <el-button type="text" @click="delNews(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-button class="addBtn" type="primary" @click="addNew">新增项目</el-button>
     </div>
     <!-- 分页功能 -->
     <div class="pagination-container">
@@ -73,65 +44,33 @@
     </div>
     <!-- 主体内容结束 -->
     <!-- 下面是编辑模态框 -->
-    <el-dialog :visible.sync="dialogTableVisible2" custom-class="sssss" top="20vh" width="500px">
+    <el-dialog :visible.sync="dialogTableVisible2" custom-class="sssss" top="10vh" width="700px">
       <div class="diaTilte">
-        <div class="titleMotai">处理情况</div>
-        <div class="items">
-          <div class="abs abs1">创建时间：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.create_at"
-            ></el-input>
-          </span>
-        </div>
-        <!-- <div class="items"><div class="abs abs1">员工编号：</div><span><el-input  :disabled="true" size="small"  style="width:46.17%; height:40px;" v-model="msg1.id" ></el-input></span></div>  -->
-        <div class="items">
-          <div class="abs abs1">公司名称：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.company_name"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">联系电话：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.mobile"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">联系人：</div>
-          <span>
-            <el-input
-              :disabled="true"
-              size="small"
-              style="width:46.17%; height:40px;"
-              v-model="msg1.contact_user"
-            ></el-input>
-          </span>
-        </div>
-        <div class="items">
-          <div class="abs abs1">处理情况：</div>
-          <span>
-            <el-input size="small" style="width:46.17%; height:40px;" v-model="msg1.remarks"></el-input>
-          </span>
-        </div>
-
-        <!-- 下面是按钮 -->
-        <div class="btnBoxs">
-          <el-button class="submmitBtn" @click="submitChange">确定</el-button>
-        </div>
+        <div class="titleMotai">{{title}}</div>
+        <el-form label-width="80px">
+          <el-form-item label="项目名称">
+            <el-input style="width: 300px;" v-model="msg1.name"></el-input>
+          </el-form-item>
+          <el-form-item label="简介">
+            <el-input style="width: 300px;" v-model="msg1.introduction"></el-input>
+          </el-form-item>
+          <el-form-item label="内容">
+            <el-input type="textarea" style="width: 300px;" :rows="7" v-model="msg1.content"></el-input>
+          </el-form-item>
+          <el-form-item label="封面">
+            <el-upload
+              class="avatar-uploader"
+              action="/api/banner_img/file_or_img/"
+              :show-file-list="false"
+              :on-change="handlePictureCardPreview"
+              :before-upload="beforeAvatarUpload"
+            >
+              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+              <img v-else :src="msg1.cover_img" class="avatar" alt="暂无图片" />
+            </el-upload>
+          </el-form-item>
+          <el-button type="primary" @click="submitForm()">保存</el-button>
+        </el-form>
       </div>
     </el-dialog>
     <!-- 编辑模态框结束 -->
@@ -140,13 +79,14 @@
 
 <script>
 import Search from "./components/Search.vue";
-
-import { showCm, markCm, editCm } from "@/api/news";
+import { updataImg } from "@/api/table";
+import { showCm, markCm, editCm, delNews } from "@/api/news";
 export default {
   name: "Applicants",
 
   data() {
     return {
+      title: "编辑",
       pages: {
         page: 1,
         size: 10
@@ -168,7 +108,9 @@ export default {
       },
       msg1: {},
       password: "",
-      gridData: []
+      gridData: [],
+      imageUrl: "",
+      type: ""
     };
   },
   components: {
@@ -176,6 +118,15 @@ export default {
   },
   created() {
     this.getList();
+  },
+  watch: {
+    dialogTableVisible2(val) {
+      console.log("+++++");
+      console.log(val);
+      if (!val) {
+        this.imageUrl = "";
+      }
+    }
   },
   methods: {
     // 搜索按钮传值回来
@@ -191,22 +142,27 @@ export default {
       console.log(datas);
       this.getList(datas);
     },
-    // 获取角色权限基本列表信息
+    // 获取列表信息
     getList(data) {
       this.listLoading = true;
 
       var basicURL =
-        "/api/other_module/join_hand/?page=" +
+        "/yanghua_edu/api/project_module/service_content/?pg=" +
         this.pages.page +
         "&size=" +
         this.pages.size;
       showCm(basicURL).then(res => {
+        console.log("我要报考");
         console.log(res);
-        var dataList = res.data.ret;
-        console.log(dataList);
+        if (res.code == 1) {
+          var dataList = res.data.ret;
+          console.log(dataList);
 
-        this.total = res.data.count;
-        this.gridData = dataList;
+          this.total = res.data.count;
+          this.gridData = dataList;
+        } else {
+          this.message(res.msg, res.code);
+        }
       });
       setTimeout(() => {
         this.listLoading = false;
@@ -225,48 +181,50 @@ export default {
         type: types
       });
     },
-    // 编辑按钮
-    edits(val) {
-      console.log(val);
-      this.dialogTableVisible2 = true;
-      this.msg1 = val;
-    },
-    // 启用切换
-    handover(val) {
-      var obj = { id: val.id };
-      var detailURL = "/api/other_module/join_hand/";
-
-      markCm(detailURL, obj).then(res => {
+    delNews(val) {
+      var data = {
+        id: val
+      };
+      var url = "/yanghua_edu/api/project_module/service_content/";
+      delNews(url, data).then(res => {
         console.log(res);
         this.message(res.msg, res.code);
         this.getList();
       });
     },
+    // 编辑按钮
+    edits(val) {
+      console.log(val);
+      this.dialogTableVisible2 = true;
+      this.msg1 = val;
+      this.title = "编辑";
+      this.type = "edit";
+    },
 
     // 新增员工
-    addSumbit(val) {
-      console.log(val);
-      this.dialogTableVisible1 = true;
+    addNew() {
+      this.msg1 = {};
+      this.title = "新增";
+      this.type = "add";
+      this.dialogTableVisible2 = true;
     },
-    // 下面是新增员工权限提交按钮
-    submitAdd() {
-      var detailURL = "/backend/api/v1/admin/createadmin/";
-      userAdd(detailURL, this.msg).then(res => {
-        console.log(res);
-        this.dialogTableVisible1 = false;
-        this.message(res.data.msg, res.data.code);
-      });
-    },
+
     // 修改
-    submitChange() {
-      var data = {
-        remarks: this.msg1.remarks,
-        id: this.msg1.id
-      };
-      console.log(data);
-      editCm(data).then(res => {
+    submitForm() {
+      var methodsType = "put";
+      if (this.type == "add") {
+        methodsType = "post";
+        // this.msg1.images = this.imageUrl;
+      }
+      console.log(this.msg1);
+      if (this.imageUrl) {
+        this.msg1.cover_img = this.imageUrl;
+      }
+
+      var url = "/yanghua_edu/api/project_module/service_content/";
+      editCm(methodsType, url, this.msg1).then(res => {
         console.log(res);
-        if (res.code == "200") {
+        if (res.code == "1") {
           this.message(res.msg, res.code);
           this.dialogTableVisible2 = false;
           this.getList();
@@ -274,6 +232,38 @@ export default {
           this.message("操作失败！", res.code);
         }
       });
+    },
+    handlePictureCardPreview(file) {
+      console.log(file);
+
+      var img = "image";
+      var param = new FormData();
+      param.append(img, file.raw);
+      // param.append("id", ind);
+      updataImg(param).then(res => {
+        console.log(res);
+        if (res.code == "1") {
+          console.log(res.image_path);
+          this.imageUrl = res.image_path;
+        } else {
+          this.$message({
+            message: res.msg,
+            type: "error"
+          });
+        }
+      });
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
     },
     //分页功能选择
     handleSizeChange(val) {
@@ -366,10 +356,9 @@ export default {
   line-height: 36px;
   font-size: 16px;
   color: #1c3672;
-  width: 498px;
+  width: 700px;
   margin-bottom: 10px;
-
-  left: -4%;
+  left: -20px;
   top: -60px;
 }
 .d1 {
@@ -480,9 +469,16 @@ export default {
   margin-left: 5px;
   font-style: normal;
 }
-.btnBoxs {
-  position: relative;
-  top: 30px;
-  margin-bottom: -40px;
+.addBtn {
+  float: right;
+}
+.avatar {
+  width: 256px;
+  height: 256px;
+}
+</style>
+<style lang="scss">
+.el-form-item__content {
+  text-align: left;
 }
 </style>

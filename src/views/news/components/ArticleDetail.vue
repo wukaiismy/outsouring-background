@@ -4,7 +4,7 @@
  * @Github: https://github.com/wukaiismy
  * @since: 2018-12-06 15:11:32
  * @LastAuthor: wukai
- * @lastTime: 2019-05-20 17:47:30
+ * @lastTime: 2019-09-30 16:13:36
  -->
 <template>
   <div class="createPost-container">
@@ -29,18 +29,23 @@
               <el-row>
                 <el-col :span="8">
                   <el-form-item label-width="45px" label="类型:" class="postInfo-container-item">
-                    <el-select v-model="postForm.author" filterable remote placeholder="搜索类型">
+                    <el-select
+                      v-model="postForm.graphic_type_id"
+                      filterable
+                      remote
+                      placeholder="搜索类型"
+                    >
                       <el-option
                         v-for="(item,index) in userListOptions"
                         :key="item+index"
-                        :label="item"
-                        :value="item"
+                        :label="item.value"
+                        :value="item.key"
                       />
                     </el-select>
                   </el-form-item>
                 </el-col>
 
-                <el-col :span="10">
+                <!-- <el-col :span="10">
                   <el-form-item label-width="80px" label="发布时间:" class="postInfo-container-item">
                     <el-date-picker
                       v-model="postForm.display_time"
@@ -50,9 +55,9 @@
                       placeholder="选择日期时间"
                     />
                   </el-form-item>
-                </el-col>
+                </el-col>-->
 
-                <el-col :span="6">
+                <!-- <el-col :span="6">
                   <el-form-item label-width="60px" label="来源:" class="postInfo-container-item">
                     <el-input
                       :rows="1"
@@ -63,7 +68,7 @@
                       placeholder="请输入新闻来源"
                     />
                   </el-form-item>
-                </el-col>
+                </el-col>-->
               </el-row>
             </div>
           </el-col>
@@ -72,7 +77,7 @@
         <el-form-item style="margin-bottom: 40px;" label-width="45px" label="摘要:">
           <el-input
             :rows="1"
-            v-model="postForm.content_short"
+            v-model="postForm.description"
             type="textarea"
             class="article-textarea"
             autosize
@@ -95,7 +100,7 @@
           </el-form-item>
         </div>
         <div class="editor-container">
-          <Tinymce ref="editor" :height="400" v-model="postForm.content"/>
+          <Tinymce ref="editor" :height="400" v-model="postForm.content" />
         </div>
       </div>
     </el-form>
@@ -105,21 +110,23 @@
 <script>
 import Tinymce from "@/components/Tinymce";
 import MDinput from "@/components/MDinput";
-
+import { updataImg } from "@/api/table";
 import { addNews } from "@/api/news";
 
 const defaultForm = {
   status: "draft",
   title: "", // 文章题目
   content: "", // 文章内容
-  content_short: "", // 文章摘要
+  graphic_type_id: "", //类型
+  description: "", // 文章摘要
   source_uri: "", // 文章外链
   image_uri: "", // 文章图片
   display_time: undefined, // 前台展示时间
   id: undefined,
   platforms: ["a-platform"],
   comment_disabled: false,
-  urls: ""
+  urls: "",
+  cover_img: ""
 };
 
 export default {
@@ -151,7 +158,13 @@ export default {
       postForm: Object.assign({}, defaultForm),
       loading: false,
       files: "",
-      userListOptions: ["行业新闻", "政策法规", "平台新闻"],
+      imageUrl: "",
+      userListOptions: [
+        { key: 1, value: "行业动态" },
+        { key: 2, value: "专业指导" },
+        { key: 3, value: "考试攻略" },
+        { key: 4, value: "报考指南" }
+      ],
       rules: {
         image_uri: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
@@ -162,7 +175,7 @@ export default {
   },
   computed: {
     contentShortLength() {
-      return this.postForm.content_short.length;
+      return this.postForm.description.length;
     },
     lang() {
       return this.$store.getters.language;
@@ -183,8 +196,22 @@ export default {
       console.log(file, fileList);
     },
     handlePictureCardPreview(file) {
-      console.log(file);
-      this.files = file.raw;
+      var img = "image";
+      var param = new FormData();
+      param.append(img, file.raw);
+      // param.append("id", ind);
+      updataImg(param).then(res => {
+        console.log(res);
+        if (res.code == "1") {
+          console.log(res.image_path);
+          this.imageUrl = res.image_path;
+        } else {
+          this.$message({
+            message: res.msg,
+            type: "error"
+          });
+        }
+      });
     },
     fetchData(id) {
       fetchArticle(id)
@@ -209,29 +236,36 @@ export default {
       this.$store.dispatch("updateVisitedView", route);
     },
     submitForm() {
-      // this.postForm.display_time = parseInt(this.display_time / 1000);
+      this.postForm.cover_img = this.imageUrl;
       console.log(this.postForm);
-      var type = "";
-      if (this.postForm.author == "行业新闻") {
-        type = 1;
-      } else if (this.postForm.author == "政策法规") {
-        type = 0;
-      } else if (this.postForm.author == "平台新闻") {
-        type = 2;
-      }
-      var param = new FormData();
-      param.append("urls", this.postForm.urls);
-      param.append("topic", this.postForm.title);
-      param.append("content", this.postForm.content);
-      param.append("author", "super_admin");
-      param.append("type_of", type);
-      param.append("cover", this.files);
-      param.append("create_at", this.postForm.display_time);
-      param.append("summary", this.postForm.content_short);
-      var Url = "/website/backstage/add_new/";
-      addNews(Url, param).then(res => {
+
+      var dataList = {
+        title: this.postForm.title,
+        graphic_type_id: this.postForm.graphic_type_id,
+        cover_img: this.postForm.cover_img,
+        content: this.postForm.content,
+        description: this.postForm.description
+      };
+      // if (this.postForm.author == "行业新闻") {
+      //   type = 1;
+      // } else if (this.postForm.author == "政策法规") {
+      //   type = 0;
+      // } else if (this.postForm.author == "平台新闻") {
+      //   type = 2;
+      // }
+      // var param = new FormData();
+      // param.append("urls", this.postForm.urls);
+      // param.append("topic", this.postForm.title);
+      // param.append("content", this.postForm.content);
+      // param.append("author", "super_admin");
+      // param.append("type_of", type);
+      // param.append("cover", this.files);
+      // param.append("create_at", this.postForm.display_time);
+      // param.append("summary", this.postForm.content_short);
+      var Url = "/yanghua_edu/api/graphic_module/graphic/";
+      addNews(Url, dataList).then(res => {
         console.log(res);
-        if (res.code == "200") {
+        if (res.code == "1") {
           this.$message({
             message: res.msg,
             type: "success"
