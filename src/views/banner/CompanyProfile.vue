@@ -53,7 +53,7 @@ export default {
     submitForm() {
       console.log(this.parmsData);
       this.listLoading = true;
-      var basicURL = "/yanghua_edu/api/other_module/bottom_content/";
+      var basicURL = "/yanghua_edu/api/other_module/company_profile/";
       getMsg("POST", basicURL, this.parmsData).then(res => {
         console.log(res);
         this.listLoading = false;

@@ -74,6 +74,12 @@ export const constantRouterMap = [
         name: "CompanyProfile",
         component: () => import("@/views/banner/CompanyProfile"),
         meta: { title: "公司简介", icon: "tree" }
+      },
+      {
+        path: "Notify",
+        name: "Notify",
+        component: () => import("@/views/banner/Notify"),
+        meta: { title: "通知公告", icon: "tree" }
       }
     ]
   },

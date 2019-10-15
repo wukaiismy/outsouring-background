@@ -1,5 +1,5 @@
 <template>
-  <article-detail :is-edit="false"/>
+  <article-detail :is-edit="false" />
 </template>
 
 <script>
@@ -13,6 +13,7 @@ export default {
       URL: "/website/backstage/add_new/"
     };
   },
+  created() {},
   methods: {}
 };
 </script>

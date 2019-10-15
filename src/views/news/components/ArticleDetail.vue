@@ -4,7 +4,7 @@
  * @Github: https://github.com/wukaiismy
  * @since: 2018-12-06 15:11:32
  * @LastAuthor: wukai
- * @lastTime: 2019-09-30 16:13:36
+ * @lastTime: 2019-10-15 21:21:03
  -->
 <template>
   <div class="createPost-container">
@@ -73,7 +73,7 @@
             </div>
           </el-col>
         </el-row>
-
+        <!-- 
         <el-form-item style="margin-bottom: 40px;" label-width="45px" label="摘要:">
           <el-input
             :rows="1"
@@ -84,7 +84,7 @@
             placeholder="请输入内容"
           />
           <span v-show="contentShortLength" class="word-counter">{{ contentShortLength }}字</span>
-        </el-form-item>
+        </el-form-item>-->
         <div style="margin-bottom: 20px;">
           <el-form-item label-width="45px" label="图片:" class="postInfo-container-item">
             <el-upload
@@ -95,6 +95,13 @@
               :auto-upload="false"
               :limit="1"
             >
+              <img
+                v-if="!imageUrl.length"
+                style="width:146px;height:146px"
+                :src="postForm.cover_img"
+                referrer="no-referrer"
+                alt
+              />
               <i class="el-icon-plus"></i>
             </el-upload>
           </el-form-item>
@@ -111,7 +118,7 @@
 import Tinymce from "@/components/Tinymce";
 import MDinput from "@/components/MDinput";
 import { updataImg } from "@/api/table";
-import { addNews } from "@/api/news";
+import { addNews, getsNews } from "@/api/news";
 
 const defaultForm = {
   status: "draft",
@@ -159,6 +166,7 @@ export default {
       loading: false,
       files: "",
       imageUrl: "",
+      isEdit1: false,
       userListOptions: [
         { key: 1, value: "行业动态" },
         { key: 2, value: "专业指导" },
@@ -174,24 +182,44 @@ export default {
     };
   },
   computed: {
-    contentShortLength() {
-      return this.postForm.description.length;
-    },
+    // contentShortLength() {
+    //   return this.postForm.description.length;
+    // },
     lang() {
       return this.$store.getters.language;
     }
   },
   created() {
-    if (this.isEdit) {
-      const id = this.$route.params && this.$route.params.id;
-      this.fetchData(id);
-    } else {
-      this.postForm = Object.assign({}, defaultForm);
+    const id = this.$route.query && this.$route.query.id;
+    console.log(id);
+    if (id) {
+      this.getDetail(id);
+      this.isEdit1 = true;
     }
+    // if (this.isEdit) {
+    //   const id = this.$route.query && this.$route.query.id;
+    //   this.fetchData(id);
+    // } else {
+    //   this.postForm = Object.assign({}, defaultForm);
+    // }
 
     this.tempRoute = Object.assign({}, this.$route);
   },
   methods: {
+    getDetail(id) {
+      var Url = "/yanghua_edu/api/graphic_module/graphic/";
+      getsNews(Url, { id: id }).then(res => {
+        console.log(res);
+        if (res.code == "1") {
+          this.postForm = res.data;
+        } else {
+          this.$message({
+            message: res.msg,
+            type: "error"
+          });
+        }
+      });
+    },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
@@ -236,7 +264,10 @@ export default {
       this.$store.dispatch("updateVisitedView", route);
     },
     submitForm() {
-      this.postForm.cover_img = this.imageUrl;
+      if (this.imageUrl.length) {
+        this.postForm.cover_img = this.imageUrl;
+      }
+
       console.log(this.postForm);
 
       var dataList = {
@@ -244,7 +275,7 @@ export default {
         graphic_type_id: this.postForm.graphic_type_id,
         cover_img: this.postForm.cover_img,
         content: this.postForm.content,
-        description: this.postForm.description
+        description: this.postForm.description || "-"
       };
       // if (this.postForm.author == "行业新闻") {
       //   type = 1;
@@ -263,7 +294,12 @@ export default {
       // param.append("create_at", this.postForm.display_time);
       // param.append("summary", this.postForm.content_short);
       var Url = "/yanghua_edu/api/graphic_module/graphic/";
-      addNews(Url, dataList).then(res => {
+      var med = "post";
+      if (this.isEdit1) {
+        med = "put";
+        dataList.id = this.postForm.id;
+      }
+      addNews(Url, med, dataList).then(res => {
         console.log(res);
         if (res.code == "1") {
           this.$message({

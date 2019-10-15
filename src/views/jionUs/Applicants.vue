@@ -17,7 +17,7 @@
         <el-table-column property="name" label="项目名字" align="center"></el-table-column>
 
         <el-table-column property="introduction" label="简介" align="center"></el-table-column>
-        <el-table-column property="content" label="简介" align="center"></el-table-column>
+        <!-- <el-table-column property="content" label="简介" align="center"></el-table-column> -->
 
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
@@ -44,7 +44,7 @@
     </div>
     <!-- 主体内容结束 -->
     <!-- 下面是编辑模态框 -->
-    <el-dialog :visible.sync="dialogTableVisible2" custom-class="sssss" top="10vh" width="700px">
+    <el-dialog :visible.sync="dialogTableVisible2" custom-class="sssss" top="10vh" width="1000px">
       <div class="diaTilte">
         <div class="titleMotai">{{title}}</div>
         <el-form label-width="80px">
@@ -55,7 +55,10 @@
             <el-input style="width: 300px;" v-model="msg1.introduction"></el-input>
           </el-form-item>
           <el-form-item label="内容">
-            <el-input type="textarea" style="width: 300px;" :rows="7" v-model="msg1.content"></el-input>
+            <div class="editor-container">
+              <Tinymce ref="editor" :height="400" :width="200" v-model="content" />
+            </div>
+            <!-- <el-input type="textarea" style="width: 300px;" :rows="7" v-model="msg1.content"></el-input> -->
           </el-form-item>
           <el-form-item label="封面">
             <el-upload
@@ -79,6 +82,7 @@
 
 <script>
 import Search from "./components/Search.vue";
+import Tinymce from "@/components/Tinymce";
 import { updataImg } from "@/api/table";
 import { showCm, markCm, editCm, delNews } from "@/api/news";
 export default {
@@ -87,6 +91,7 @@ export default {
   data() {
     return {
       title: "编辑",
+      content: "",
       pages: {
         page: 1,
         size: 10
@@ -114,9 +119,10 @@ export default {
     };
   },
   components: {
-    Search
+    Search,
+    Tinymce
   },
-  created() {
+  mounted() {
     this.getList();
   },
   watch: {
@@ -125,6 +131,7 @@ export default {
       console.log(val);
       if (!val) {
         this.imageUrl = "";
+        this.getList();
       }
     }
   },
@@ -154,6 +161,7 @@ export default {
       showCm(basicURL).then(res => {
         console.log("我要报考");
         console.log(res);
+        this.listLoading = false;
         if (res.code == 1) {
           var dataList = res.data.ret;
           console.log(dataList);
@@ -164,9 +172,6 @@ export default {
           this.message(res.msg, res.code);
         }
       });
-      setTimeout(() => {
-        this.listLoading = false;
-      }, 1.5 * 1000);
     },
     // 提示框函数
     message(msg, status) {
@@ -197,8 +202,10 @@ export default {
       console.log(val);
       this.dialogTableVisible2 = true;
       this.msg1 = val;
+      this.content = val.content;
       this.title = "编辑";
       this.type = "edit";
+      console.log(this.content);
     },
 
     // 新增员工
@@ -220,7 +227,7 @@ export default {
       if (this.imageUrl) {
         this.msg1.cover_img = this.imageUrl;
       }
-
+      this.msg1.content = this.content;
       var url = "/yanghua_edu/api/project_module/service_content/";
       editCm(methodsType, url, this.msg1).then(res => {
         console.log(res);
@@ -281,7 +288,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style rel="stylesheet/scss" lang="scss" scoped>
 .userSearch {
   font-size: 14px;
   color: #666666;
@@ -356,7 +363,7 @@ export default {
   line-height: 36px;
   font-size: 16px;
   color: #1c3672;
-  width: 700px;
+  width: 1000px;
   margin-bottom: 10px;
   left: -20px;
   top: -60px;
@@ -416,6 +423,17 @@ export default {
   font-size: 14px;
   margin-left: 30px;
   margin-right: 20px;
+}
+.editor-container {
+  min-height: 500px;
+  margin: 0 0 30px;
+  .editor-upload-btn-container {
+    text-align: right;
+    margin-right: 10px;
+    .editor-upload-btn {
+      display: inline-block;
+    }
+  }
 }
 .submmitBtn {
   background-image: linear-gradient(-180deg, #d1ddf6 0%, #ebf1fc 100%);
@@ -480,5 +498,6 @@ export default {
 <style lang="scss">
 .el-form-item__content {
   text-align: left;
+  padding-right: 50px;
 }
 </style>

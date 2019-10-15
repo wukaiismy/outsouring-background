@@ -12,6 +12,8 @@ service.defaults.headers.post["Content-Type"] =
   "application/json;charset=UTF-8";
 service.defaults.headers.delete["Content-Type"] =
   "application/json;charset=UTF-8";
+service.defaults.headers.patch["Content-Type"] =
+  "application/json;charset=UTF-8";
 service.defaults.headers.put["Content-Type"] = "application/json;charset=UTF-8";
 service.defaults.headers.get["Content-Type"] = "application/json;charset=UTF-8";
 service.defaults.transformRequest = function(data) {

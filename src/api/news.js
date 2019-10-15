@@ -7,10 +7,10 @@ export function getList(URL) {
   });
 }
 // 添加新闻
-export function addNews(URL, data) {
+export function addNews(URL, method1, data) {
   return request({
     url: URL,
-    method: "post",
+    method: method1,
     // headers: { "Content-Type": "multipart/form-data" },
     data
   });
@@ -20,6 +20,14 @@ export function delNews(url, data) {
   return request({
     url: url,
     method: "delete",
+    data
+  });
+}
+// 查看图文详情
+export function getsNews(url, data) {
+  return request({
+    url: url,
+    method: "patch",
     data
   });
 }
