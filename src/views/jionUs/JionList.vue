@@ -13,7 +13,11 @@
         highlight-current-row
         style="width:100%;"
       >
-        <el-table-column property="create_time" label="创建时间" align="center"></el-table-column>
+        <el-table-column label="创建时间" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.create_time|timeType}}</span>
+          </template>
+        </el-table-column>
         <el-table-column property="name" label="名字" align="center"></el-table-column>
         <el-table-column label="性别" align="center">
           <template slot-scope="scope">
@@ -141,13 +145,7 @@ export default {
         console.log(res);
         var dataList = res.data.ret;
         console.log(dataList);
-        // 处理时间
-        for (var i = 0; i < dataList.length; i++) {
-          dataList[i].create_time = dataList[i].create_time
-            .split('T')
-            .join(' ')
-            .substring(0, 19);
-        }
+
         this.total = res.data.count;
         this.gridData = dataList;
       });

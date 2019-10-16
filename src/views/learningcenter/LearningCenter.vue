@@ -13,7 +13,11 @@
         highlight-current-row
         style="width:100%;"
       >
-        <el-table-column property="create_time" label="创建时间" align="center"></el-table-column>
+        <el-table-column label="创建时间" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.create_time|timeType}}</span>
+          </template>
+        </el-table-column>
         <el-table-column property="title" label="标题" align="center"></el-table-column>
         <el-table-column property="introduction" label="介绍" align="center"></el-table-column>
         <el-table-column property="url" label="跳转地址" align="center"></el-table-column>
@@ -159,13 +163,7 @@ export default {
         if (res.code == 1) {
           var dataList = res.data.ret;
           console.log(dataList);
-          // 处理时间
-          for (var i = 0; i < dataList.length; i++) {
-            dataList[i].create_time = dataList[i].create_time
-              .split('T')
-              .join(' ')
-              .substring(0, 19);
-          }
+
           this.total = res.data.count;
           this.gridData = dataList;
         } else {
