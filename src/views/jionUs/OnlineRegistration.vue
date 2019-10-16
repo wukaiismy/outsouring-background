@@ -76,11 +76,11 @@
 </template>
 
 <script>
-import Search from "./components/Search.vue";
+import Search from './components/Search.vue';
 
-import { showCm, markCm } from "@/api/news";
+import { showCm, markCm } from '@/api/news';
 export default {
-  name: "OnlineRegistration",
+  name: 'OnlineRegistration',
 
   data() {
     return {
@@ -88,21 +88,21 @@ export default {
         page: 1,
         size: 10
       },
-      textarea3: "",
+      textarea3: '',
       multipleSelection: [],
-      value1: "",
+      value1: '',
       tableKey: 0,
       list: null,
       total: 1,
       listLoading: true,
 
       msg: {
-        name: "",
-        mobile: "",
-        password: ""
+        name: '',
+        mobile: '',
+        password: ''
       },
       msg1: {},
-      password: "",
+      password: '',
       gridData: []
     };
   },
@@ -131,17 +131,23 @@ export default {
       this.listLoading = true;
 
       var basicURL =
-        "/yanghua_edu/api/other_module/online_sign/?pg=" +
+        '/yanghua_edu/api/other_module/online_sign/?pg=' +
         this.pages.page +
-        "&size=" +
+        '&size=' +
         this.pages.size;
       showCm(basicURL).then(res => {
-        console.log("在线报名");
+        console.log('在线报名');
 
         console.log(res);
         var dataList = res.data.ret;
         console.log(dataList);
-
+        // 处理时间
+        for (var i = 0; i < dataList.length; i++) {
+          dataList[i].create_time = dataList[i].create_time
+            .split('T')
+            .join(' ')
+            .substring(0, 19);
+        }
         this.total = res.data.count;
         this.gridData = dataList;
       });
@@ -151,11 +157,11 @@ export default {
     },
     // 提示框函数
     message(msg, status) {
-      var types = "";
-      if (status == "1") {
-        types = "success";
+      var types = '';
+      if (status == '1') {
+        types = 'success';
       } else {
-        types = "error";
+        types = 'error';
       }
       this.$message({
         message: msg,
@@ -166,7 +172,7 @@ export default {
     // 启用切换
     handover(val) {
       var obj = { id: val.id };
-      var detailURL = "/yanghua_edu/api/other_module/join_hand/";
+      var detailURL = '/yanghua_edu/api/other_module/join_hand/';
 
       markCm(detailURL, obj).then(res => {
         console.log(res);
@@ -183,7 +189,7 @@ export default {
     },
     //分页功能选择
     handleCurrentChange(val) {
-      console.log("选择分页");
+      console.log('选择分页');
       this.pages.page = val;
       this.getList();
     }
