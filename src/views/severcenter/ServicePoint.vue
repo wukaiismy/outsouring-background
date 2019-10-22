@@ -13,7 +13,11 @@
         highlight-current-row
         style="width:100%;"
       >
-        <el-table-column property="create_time" label="创建时间" align="center"></el-table-column>
+        <el-table-column label="创建时间" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.create_time|timeType}}</span>
+          </template>
+        </el-table-column>
         <el-table-column property="name" label="服务点名称" align="center"></el-table-column>
         <el-table-column property="address" label="省市县" align="center"></el-table-column>
         <el-table-column property="detailed_address" label="详细地址" align="center"></el-table-column>
@@ -98,22 +102,22 @@
 </template>
 
 <script>
-import Search from "../jionUs/components/Search";
-import { updataImg } from "@/api/table";
-import { showCm, markCm, editCm, delNews } from "@/api/news";
+import Search from '../jionUs/components/Search';
+import { updataImg } from '@/api/table';
+import { showCm, markCm, editCm, delNews } from '@/api/news';
 export default {
-  name: "ServicePoint",
+  name: 'ServicePoint',
 
   data() {
     return {
-      title: "编辑",
+      title: '编辑',
       pages: {
         page: 1,
         size: 10
       },
-      textarea3: "",
+      textarea3: '',
       multipleSelection: [],
-      value1: "",
+      value1: '',
       tableKey: 0,
       list: null,
       total: 1,
@@ -122,15 +126,15 @@ export default {
       dialogTableVisible1: false,
       dialogTableVisible2: false,
       msg: {
-        name: "",
-        mobile: "",
-        password: ""
+        name: '',
+        mobile: '',
+        password: ''
       },
       msg1: {},
-      password: "",
+      password: '',
       gridData: [],
-      imageUrl: "",
-      type: ""
+      imageUrl: '',
+      type: ''
     };
   },
   components: {
@@ -141,10 +145,10 @@ export default {
   },
   watch: {
     dialogTableVisible2(val) {
-      console.log("+++++");
+      console.log('+++++');
       console.log(val);
       if (!val) {
-        this.imageUrl = "";
+        this.imageUrl = '';
       }
     }
   },
@@ -167,12 +171,12 @@ export default {
       this.listLoading = true;
 
       var basicURL =
-        "/yanghua_edu/api/service_point/service_point/?pg=" +
+        '/yanghua_edu/api/service_point/service_point/?pg=' +
         this.pages.page +
-        "&size=" +
+        '&size=' +
         this.pages.size;
       showCm(basicURL).then(res => {
-        console.log("服务中心");
+        console.log('服务中心');
         console.log(res);
         if (res.code == 1) {
           var dataList = res.data.ret;
@@ -190,11 +194,11 @@ export default {
     },
     // 提示框函数
     message(msg, status) {
-      var types = "";
-      if (status == "1") {
-        types = "success";
+      var types = '';
+      if (status == '1') {
+        types = 'success';
       } else {
-        types = "error";
+        types = 'error';
       }
       this.$message({
         message: msg,
@@ -205,7 +209,7 @@ export default {
       var data = {
         id: val
       };
-      var url = "/yanghua_edu/api/service_point/service_point/";
+      var url = '/yanghua_edu/api/service_point/service_point/';
       delNews(url, data).then(res => {
         console.log(res);
         this.message(res.msg, res.code);
@@ -217,23 +221,23 @@ export default {
       console.log(val);
       this.dialogTableVisible2 = true;
       this.msg1 = val;
-      this.title = "编辑";
-      this.type = "edit";
+      this.title = '编辑';
+      this.type = 'edit';
     },
 
     // 新增员工
     addNew() {
       this.msg1 = {};
-      this.title = "新增";
-      this.type = "add";
+      this.title = '新增';
+      this.type = 'add';
       this.dialogTableVisible2 = true;
     },
 
     // 修改
     submitForm() {
-      var methodsType = "put";
-      if (this.type == "add") {
-        methodsType = "post";
+      var methodsType = 'put';
+      if (this.type == 'add') {
+        methodsType = 'post';
         // this.msg1.images = this.imageUrl;
       }
       console.log(this.msg1);
@@ -241,47 +245,47 @@ export default {
         this.msg1.address_map = this.imageUrl;
       }
 
-      var url = "/yanghua_edu/api/service_point/service_point/";
+      var url = '/yanghua_edu/api/service_point/service_point/';
       editCm(methodsType, url, this.msg1).then(res => {
         console.log(res);
-        if (res.code == "1") {
+        if (res.code == '1') {
           this.message(res.msg, res.code);
           this.dialogTableVisible2 = false;
           this.getList();
         } else {
-          this.message("操作失败！", res.code);
+          this.message('操作失败！', res.code);
         }
       });
     },
     handlePictureCardPreview(file) {
       console.log(file);
 
-      var img = "image";
+      var img = 'image';
       var param = new FormData();
       param.append(img, file.raw);
       // param.append("id", ind);
       updataImg(param).then(res => {
         console.log(res);
-        if (res.code == "1") {
+        if (res.code == '1') {
           console.log(res.image_path);
           this.imageUrl = res.image_path;
         } else {
           this.$message({
             message: res.msg,
-            type: "error"
+            type: 'error'
           });
         }
       });
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg";
+      const isJPG = file.type === 'image/jpeg';
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+        this.$message.error('上传头像图片只能是 JPG 格式!');
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$message.error('上传头像图片大小不能超过 2MB!');
       }
       return isJPG && isLt2M;
     },
@@ -293,7 +297,7 @@ export default {
     },
     //分页功能选择
     handleCurrentChange(val) {
-      console.log("选择分页");
+      console.log('选择分页');
       this.pages.page = val;
       this.getList();
     }

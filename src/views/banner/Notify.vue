@@ -2,6 +2,7 @@
   <div id="dalos">
     <!-- <Search @channelSearch="channelSearch" /> -->
     <!-- 我是表格组件 -->
+
     <div class="bigBoxs">
       <el-table
         class="tableBox"
@@ -13,25 +14,26 @@
         highlight-current-row
         style="width:100%;"
       >
-        <el-table-column property="create_time" label="创建时间" align="center"></el-table-column>
-        <el-table-column label="类型" align="center">
+        <el-table-column label="创建时间" align="center" width="190%">
           <template slot-scope="scope">
-            <span type="text" size="small" class="shangjia" v-if="scope.row.type_of==1">通知</span>
-            <span type="text" size="small" class="shanchu" v-else>公告</span>
+            <span>{{scope.row.create_time|timeType}}</span>
           </template>
         </el-table-column>
-
-        <el-table-column property="introduction" label="简介" align="center"></el-table-column>
+        <el-table-column label="类型" align="center" width="120%">
+          <template slot-scope="scope">
+            <span type="text" v-if="scope.row.type_of==1">通知</span>
+            <span type="text" v-else>公告</span>
+          </template>
+        </el-table-column>
         <el-table-column property="content" label="内容" align="center"></el-table-column>
 
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" width="120%">
           <template slot-scope="scope">
-            <el-button type="text" @click="edits(scope.row)">编辑</el-button>
             <el-button type="text" @click="delNews(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <el-button class="addBtn" type="primary" @click="addNew">新增项目</el-button>
+      <el-button class="addBtn" type="primary" @click="addNew">新增</el-button>
     </div>
     <!-- 分页功能 -->
     <div class="pagination-container">
@@ -53,26 +55,19 @@
       <div class="diaTilte">
         <div class="titleMotai">{{title}}</div>
         <el-form label-width="80px">
-          <el-form-item label="服务名称">
-            <el-input style="width: 300px;" v-model="msg1.name"></el-input>
+          <el-form-item label="类型">
+            <el-select v-model="msg1.type_of" placeholder="请选择" style="width:220px;">
+              <el-option
+                v-for="item in typeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="简介">
-            <el-input style="width: 300px;" v-model="msg1.introduction"></el-input>
-          </el-form-item>
+
           <el-form-item label="内容">
             <el-input type="textarea" style="width: 300px;" :rows="7" v-model="msg1.content"></el-input>
-          </el-form-item>
-          <el-form-item label="封面">
-            <el-upload
-              class="avatar-uploader"
-              action="/api/banner_img/file_or_img/"
-              :show-file-list="false"
-              :on-change="handlePictureCardPreview"
-              :before-upload="beforeAvatarUpload"
-            >
-              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-              <img v-else :src="msg1.cover_img" class="avatar" alt="暂无图片" />
-            </el-upload>
           </el-form-item>
           <el-button type="primary" @click="submitForm()">保存</el-button>
         </el-form>
@@ -83,39 +78,27 @@
 </template>
 
 <script>
-import Search from "../jionUs/components/Search";
-import { updataImg } from "@/api/table";
-import { showCm, markCm, editCm, delNews } from "@/api/news";
+import Search from '../jionUs/components/Search';
+import { updataImg } from '@/api/table';
+import { showCm, markCm, editCm, delNews } from '@/api/news';
 export default {
-  name: "Notify",
+  name: 'Notify',
 
   data() {
     return {
-      title: "编辑",
+      title: '编辑',
       pages: {
         page: 1,
         size: 10
       },
-      textarea3: "",
-      multipleSelection: [],
-      value1: "",
+      typeOptions: [{ value: 1, label: '通知' }, { value: 2, label: '公告' }],
       tableKey: 0,
-      list: null,
       total: 1,
       listLoading: true,
-      dialogTableVisible: false,
-      dialogTableVisible1: false,
       dialogTableVisible2: false,
-      msg: {
-        name: "",
-        mobile: "",
-        password: ""
-      },
       msg1: {},
-      password: "",
       gridData: [],
-      imageUrl: "",
-      type: ""
+      type: ''
     };
   },
   components: {
@@ -124,15 +107,7 @@ export default {
   created() {
     this.getList();
   },
-  watch: {
-    dialogTableVisible2(val) {
-      console.log("+++++");
-      console.log(val);
-      if (!val) {
-        this.imageUrl = "";
-      }
-    }
-  },
+
   methods: {
     // 搜索按钮传值回来
     channelSearch(data) {
@@ -152,13 +127,14 @@ export default {
       this.listLoading = true;
 
       var basicURL =
-        "/yanghua_edu/api/project_module/server_hall/?pg=" +
+        '/yanghua_edu/api/other_module/notic_manage/?pg=' +
         this.pages.page +
-        "&size=" +
+        '&size=' +
         this.pages.size;
       showCm(basicURL).then(res => {
-        console.log("服务中心");
+        console.log('通知公告');
         console.log(res);
+        this.listLoading = false;
         if (res.code == 1) {
           var dataList = res.data.ret;
           console.log(dataList);
@@ -169,17 +145,14 @@ export default {
           this.message(res.msg, res.code);
         }
       });
-      setTimeout(() => {
-        this.listLoading = false;
-      }, 1.5 * 1000);
     },
     // 提示框函数
     message(msg, status) {
-      var types = "";
-      if (status == "1") {
-        types = "success";
+      var types = '';
+      if (status == '1') {
+        types = 'success';
       } else {
-        types = "error";
+        types = 'error';
       }
       this.$message({
         message: msg,
@@ -190,85 +163,43 @@ export default {
       var data = {
         id: val
       };
-      var url = "/yanghua_edu/api/project_module/server_hall/";
+      var url = '/yanghua_edu/api/other_module/notic_manage/';
       delNews(url, data).then(res => {
         console.log(res);
         this.message(res.msg, res.code);
         this.getList();
       });
     },
-    // 编辑按钮
-    edits(val) {
-      console.log(val);
-      this.dialogTableVisible2 = true;
-      this.msg1 = val;
-      this.title = "编辑";
-      this.type = "edit";
-    },
 
-    // 新增员工
+    // 新增
     addNew() {
       this.msg1 = {};
-      this.title = "新增";
-      this.type = "add";
+      this.title = '新增';
+      this.type = 'add';
       this.dialogTableVisible2 = true;
     },
 
     // 修改
     submitForm() {
-      var methodsType = "put";
-      if (this.type == "add") {
-        methodsType = "post";
-        // this.msg1.images = this.imageUrl;
+      var methodsType = 'put';
+      if (this.type == 'add') {
+        methodsType = 'post';
       }
       console.log(this.msg1);
-      if (this.imageUrl) {
-        this.msg1.cover_img = this.imageUrl;
-      }
-      var url = "/yanghua_edu/api/project_module/server_hall/";
+
+      var url = '/yanghua_edu/api/other_module/notic_manage/';
       editCm(methodsType, url, this.msg1).then(res => {
         console.log(res);
-        if (res.code == "1") {
+        if (res.code == '1') {
           this.message(res.msg, res.code);
           this.dialogTableVisible2 = false;
           this.getList();
         } else {
-          this.message("操作失败！", res.code);
+          this.message('操作失败！', res.code);
         }
       });
     },
-    handlePictureCardPreview(file) {
-      console.log(file);
 
-      var img = "image";
-      var param = new FormData();
-      param.append(img, file.raw);
-      // param.append("id", ind);
-      updataImg(param).then(res => {
-        console.log(res);
-        if (res.code == "1") {
-          console.log(res.image_path);
-          this.imageUrl = res.image_path;
-        } else {
-          this.$message({
-            message: res.msg,
-            type: "error"
-          });
-        }
-      });
-    },
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
-      }
-      if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
-      }
-      return isJPG && isLt2M;
-    },
     //分页功能选择
     handleSizeChange(val) {
       this.pages.page = 1;
@@ -277,7 +208,7 @@ export default {
     },
     //分页功能选择
     handleCurrentChange(val) {
-      console.log("选择分页");
+      console.log('选择分页');
       this.pages.page = val;
       this.getList();
     }
@@ -286,24 +217,6 @@ export default {
 </script>
 
 <style scoped>
-.userSearch {
-  font-size: 14px;
-  color: #666666;
-  margin-left: 4.4%;
-}
-.searchHandle {
-  margin-left: 30px;
-  margin-top: 5px;
-}
-
-.xiaz {
-  font-size: 14px;
-  color: #1c3672;
-}
-.shanchu {
-  font-size: 14px;
-  color: #f66d23;
-}
 .bigBoxs {
   width: 96.47%;
   margin-left: 1%;
@@ -317,37 +230,7 @@ export default {
 .pagination-container {
   margin: 22px 0 60px 30%;
 }
-.allChose {
-  width: 100%;
-  min-height: 34px;
-  text-align: right;
-}
-.searchs {
-  width: 110px;
-  font-size: 14px;
-  text-align: center;
-  margin-right: 1%;
-  padding-left: 0;
-  padding-right: 0;
-}
-.item .ppss,
-.ppss {
-  color: #4990e2;
-  font-size: 14px;
-}
-.noppss {
-  color: #999999;
-  font-size: 14px;
-}
-.stopServer {
-  font-size: 14px;
-  color: #d0011b;
-}
 
-.moneyStyles {
-  font-size: 14px;
-  color: #1c3672;
-}
 /* 下面是模态框的样式*/
 #dalos .el-dialog__wrapper .el-dialog {
   margin: 0 auto 20px !important;
@@ -381,17 +264,6 @@ export default {
   text-align: left;
   margin-top: 10px;
 }
-.item1 {
-  position: relative;
-  padding: 1px 20px 0px 20px;
-  /* background-color: aqua; */
-  min-height: 20px;
-  text-align: center;
-  margin-top: 10px;
-  font-size: 14px;
-  color: #666666;
-  line-height: 20px;
-}
 
 .item span {
   font-size: 14px;
@@ -411,16 +283,6 @@ export default {
   right: 63.82%;
   color: #666666;
 }
-
-.shangjia {
-  color: #4990e2;
-}
-.chulz {
-  color: #f6a623;
-  font-size: 14px;
-  margin-left: 30px;
-  margin-right: 20px;
-}
 .submmitBtn {
   background-image: linear-gradient(-180deg, #d1ddf6 0%, #ebf1fc 100%);
   border-radius: 4px;
@@ -430,40 +292,7 @@ export default {
   height: 36px;
   /* margin-top: 30px; */
 }
-.stopBtn {
-  border: 1px solid #d0011b;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #d0011b;
-  width: 180px;
-  height: 36px;
-  margin-left: 30px;
-}
-.adds {
-  border: 1px solid #1c3672;
-  border-radius: 6px;
-  font-size: 12px;
-  color: #1c3672;
-  width: 160px;
-  height: 34px;
-}
-.items {
-  position: relative;
-  padding: 1px 0 1px 0;
-  min-height: 20px;
-  text-align: left;
-  /* margin-top: 20px; */
-}
-.items span {
-  font-size: 14px;
-  color: #333333;
-  margin-left: 37%;
-}
-.items .checked {
-  display: inline-block;
 
-  width: 60%;
-}
 .el-radio,
 .el-radio + .el-radio {
   margin-left: 0px;
@@ -475,10 +304,6 @@ export default {
 }
 .addBtn {
   float: right;
-}
-.avatar {
-  width: 256px;
-  height: 256px;
 }
 </style>
 <style lang="scss">

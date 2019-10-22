@@ -13,7 +13,11 @@
         highlight-current-row
         style="width:100%;"
       >
-        <el-table-column property="create_time" label="创建时间" align="center"></el-table-column>
+        <el-table-column label="创建时间" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.create_time|timeType}}</span>
+          </template>
+        </el-table-column>
         <el-table-column property="name" label="名字" align="center"></el-table-column>
         <el-table-column label="性别" align="center">
           <template slot-scope="scope">
@@ -76,11 +80,11 @@
 </template>
 
 <script>
-import Search from "./components/Search.vue";
+import Search from './components/Search.vue';
 
-import { showCm, markCm, editCm } from "@/api/news";
+import { showCm, markCm, editCm } from '@/api/news';
 export default {
-  name: "UserAuthorization",
+  name: 'UserAuthorization',
 
   data() {
     return {
@@ -88,9 +92,9 @@ export default {
         page: 1,
         size: 10
       },
-      textarea3: "",
+      textarea3: '',
       multipleSelection: [],
-      value1: "",
+      value1: '',
       tableKey: 0,
       list: null,
       total: 1,
@@ -99,12 +103,12 @@ export default {
       dialogTableVisible1: false,
       dialogTableVisible2: false,
       msg: {
-        name: "",
-        mobile: "",
-        password: ""
+        name: '',
+        mobile: '',
+        password: ''
       },
       msg1: {},
-      password: "",
+      password: '',
       gridData: []
     };
   },
@@ -133,9 +137,9 @@ export default {
       this.listLoading = true;
 
       var basicURL =
-        "/yanghua_edu/api/other_module/join_hand/?pg=" +
+        '/yanghua_edu/api/other_module/join_hand/?pg=' +
         this.pages.page +
-        "&size=" +
+        '&size=' +
         this.pages.size;
       showCm(basicURL).then(res => {
         console.log(res);
@@ -151,11 +155,11 @@ export default {
     },
     // 提示框函数
     message(msg, status) {
-      var types = "";
-      if (status == "1") {
-        types = "success";
+      var types = '';
+      if (status == '1') {
+        types = 'success';
       } else {
-        types = "error";
+        types = 'error';
       }
       this.$message({
         message: msg,
@@ -171,7 +175,7 @@ export default {
     // 启用切换
     handover(val) {
       var obj = { id: val.id };
-      var detailURL = "/yanghua_edu/api/other_module/join_hand/";
+      var detailURL = '/yanghua_edu/api/other_module/join_hand/';
 
       markCm(detailURL, obj).then(res => {
         console.log(res);
@@ -179,8 +183,6 @@ export default {
         this.getList();
       });
     },
-
-    
 
     //分页功能选择
     handleSizeChange(val) {
@@ -190,7 +192,7 @@ export default {
     },
     //分页功能选择
     handleCurrentChange(val) {
-      console.log("选择分页");
+      console.log('选择分页');
       this.pages.page = val;
       this.getList();
     }
