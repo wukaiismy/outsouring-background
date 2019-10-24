@@ -63,6 +63,7 @@ export default {
     fetchData() {
       this.listLoading = true;
       this.imgList = [];
+      this.imgURl = "";
       var url = {
         banner_position_name: "top"
       };
@@ -75,6 +76,13 @@ export default {
     },
     //修改图片
     changeImg(ind) {
+      if (!this.imgURl) {
+        this.$message({
+          message: "请选择图片",
+          type: "error"
+        });
+        return;
+      }
       var data = { id: ind, image: this.imgURl };
       changeList(data).then(res => {
         console.log(res);
@@ -115,7 +123,13 @@ export default {
     //新增图片
     addImg() {
       var data = { position_id: 1, image: this.imgURl };
-
+      if (!this.imgURl) {
+        this.$message({
+          message: "请选择图片",
+          type: "error"
+        });
+        return;
+      }
       addList(data).then(res => {
         console.log(res);
         if (res.code == "1") {

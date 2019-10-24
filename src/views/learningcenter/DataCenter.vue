@@ -62,7 +62,16 @@
             <el-input type="textarea" style="width: 300px;" :rows="7" v-model="msg1.description"></el-input>
           </el-form-item>
           <el-form-item label="文件地址">
-            <el-input style="width: 300px;" v-model="msg1.file_path"></el-input>
+            <el-upload
+              class="avatar-uploader"
+              action="/api/banner_img/file_or_img/"
+              :show-file-list="false"
+              :on-change="handlePictureCardPreview"
+              :before-upload="beforeAvatarUpload"
+            >
+              <!-- <img v-if="imageUrl" :src="imageUrl" class="avatar" /> -->
+              <el-input style="width: 300px;" v-model="msg1.file_path"></el-input>
+            </el-upload>
           </el-form-item>
 
           <el-button type="primary" @click="submitForm()">保存</el-button>
@@ -231,7 +240,6 @@ export default {
     },
     handlePictureCardPreview(file) {
       console.log(file);
-
       var img = "image";
       var param = new FormData();
       param.append(img, file.raw);
@@ -240,7 +248,8 @@ export default {
         console.log(res);
         if (res.code == "1") {
           console.log(res.image_path);
-          this.imageUrl = res.image_path;
+          this.msg1.file_path = res.image_path;
+          console.log("this.msg1.file_path=" + this.msg1.file_path);
         } else {
           this.$message({
             message: res.msg,
@@ -251,15 +260,12 @@ export default {
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isLt2M = file.size / 1024 / 1024 < 15;
 
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
-      }
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
-      return isJPG && isLt2M;
+      return isLt2M;
     },
     //分页功能选择
     handleSizeChange(val) {

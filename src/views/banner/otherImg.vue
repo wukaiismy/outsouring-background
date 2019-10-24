@@ -2,7 +2,8 @@
   <div class="app-container">
     <div class="title">其他图片增添</div>
     <div class="imgBox" v-for="(item, index) in imgList" :key="index">
-      <img class="imgs" :src="'/website/media/'+item" alt />
+      <div class="tite">{{item.pos_id==2?'中部图片':item.pos_id==3?'中右部图片':'底部图片'}}</div>
+      <img class="imgs" :src="item.img" alt />
       <div class="changeBox">
         <el-upload
           action="/backstage/update_cm/"
@@ -14,14 +15,14 @@
         >
           <i class="el-icon-plus"></i>
         </el-upload>
-        <el-button type="danger" class="btn" @click="changeImg(index+1)">修改上传</el-button>
+        <el-button type="danger" class="btn" @click="changeImg(item.id)">修改上传</el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { getList, changeList } from "@/api/table";
+import { getList, changeList, updataImg } from "@/api/table";
 
 export default {
   data() {
@@ -29,7 +30,8 @@ export default {
       list: null,
       listLoading: true,
       file: "",
-      imgList: []
+      imgList: [],
+      imgURl: ""
     };
   },
   created() {
@@ -40,21 +42,74 @@ export default {
     fetchData() {
       this.listLoading = true;
       this.imgList = [];
-      getList(2).then(res => {
+      this.imgURl = "";
+      var url1 = {
+        banner_position_name: "center"
+      };
+      var url2 = {
+        banner_position_name: "center-right"
+      };
+      var url3 = {
+        banner_position_name: "right-bottom"
+      };
+      this.getImg(url1);
+      this.getImg(url2);
+      this.getImg(url3, 2);
+    },
+    getImg(url, ind) {
+      getList(url).then(res => {
         console.log(res);
-        var imgLists = res.data.ret[0];
-        this.imgList.push(imgLists.img1);
-        this.imgList.push(imgLists.img2);
-        this.imgList.push(imgLists.img3);
-        this.imgList.push(imgLists.img4);
+        if (res.code == 1) {
+          var da = res.data.ret[0];
+          var obj = {
+            id: da.id,
+            img: da.image,
+            pos_id: da.position_id
+          };
+          this.imgList.push(obj);
+          if (ind === 2) {
+            var da2 = res.data.ret[1];
+            var obj2 = {
+              id: da2.id,
+              img: da2.image,
+              pos_id: da2.position_id
+            };
+            this.imgList.push(obj2);
+          }
+        }
       });
     },
     //修改图片
     changeImg(ind) {
-      var img = "image" + ind;
+      var data = { id: ind, image: this.imgURl };
+      if (!this.imgURl) {
+        this.$message({
+          message: "请选择图片",
+          type: "error"
+        });
+        return;
+      }
+      changeList(data).then(res => {
+        console.log(res);
+        if (res.code == "1") {
+          this.$message({
+            message: res.msg,
+            type: "success"
+          });
+
+          this.fetchData();
+        } else {
+          this.$message({
+            message: res.msg,
+            type: "error"
+          });
+        }
+      });
+    },
+    updataImg() {
+      var img = "image";
       var data = {
-        img: this.file,
-        id: 2
+        img: this.file
       };
       if (!this.file) {
         this.$message({
@@ -65,17 +120,15 @@ export default {
       }
       var param = new FormData();
       param.append(img, this.file);
-      param.append("id", 2);
-      var Url = "/website/backstage/update_cm2/";
-      changeList(Url, param).then(res => {
+      // param.append("id", ind);
+      updataImg(param).then(res => {
         console.log(res);
-        if (res.code == "200") {
-          this.$message({
-            message: res.msg,
-            type: "success"
-          });
+        if (res.code == "1") {
+          console.log(res.image_path);
           this.file = "";
-          this.fetchData();
+          this.imgURl = res.image_path;
+          // var data = { id: ind, image: res.image_path };
+          // this.fetchData();
         } else {
           this.$message({
             message: res.msg,
@@ -90,6 +143,7 @@ export default {
     handlePictureCardPreview(file) {
       console.log(file);
       this.file = file.raw;
+      this.updataImg();
     }
   }
 };
@@ -102,12 +156,17 @@ export default {
 }
 .imgBox {
   width: 100%;
-  height: 400px;
+  min-height: 400px;
   padding: 50px 0 0 50px;
   background-color: #f9f9f9;
   margin-bottom: 50px;
   position: relative;
   text-align: left;
+  .tite {
+    text-align: center;
+    margin: 10px auto;
+    font-size: 18px;
+  }
   .imgs {
     width: 60%;
     // height: 400px;

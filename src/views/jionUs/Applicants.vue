@@ -55,7 +55,7 @@
             <el-input style="width: 300px;" v-model="msg1.introduction"></el-input>
           </el-form-item>
           <el-form-item label="内容">
-            <div class="editor-container">
+            <div class="editor-container" v-if="isshows">
               <Tinymce ref="editor" :height="400" :width="200" v-model="content" />
             </div>
             <!-- <el-input type="textarea" style="width: 300px;" :rows="7" v-model="msg1.content"></el-input> -->
@@ -84,7 +84,7 @@
 import Search from "./components/Search.vue";
 import Tinymce from "@/components/Tinymce";
 import { updataImg } from "@/api/table";
-import { showCm, markCm, editCm, delNews } from "@/api/news";
+import { showCm, markCm, editCm, delNews, getsNews } from "@/api/news";
 export default {
   name: "Applicants",
 
@@ -92,6 +92,7 @@ export default {
     return {
       title: "编辑",
       content: "",
+      isshows: false,
       pages: {
         page: 1,
         size: 10
@@ -127,11 +128,10 @@ export default {
   },
   watch: {
     dialogTableVisible2(val) {
-      console.log("+++++");
-      console.log(val);
       if (!val) {
         this.imageUrl = "";
-        this.getList();
+        this.isshows = false;
+        // this.$router.go(0);
       }
     }
   },
@@ -199,21 +199,40 @@ export default {
     },
     // 编辑按钮
     edits(val) {
-      console.log(val);
-      this.dialogTableVisible2 = true;
-      this.msg1 = val;
-      this.content = val.content;
-      this.title = "编辑";
-      this.type = "edit";
-      console.log(this.content);
+      // console.log(val);
+      // console.log(this.content);
+      this.getDetail(val.id);
     },
-
+    getDetail(id) {
+      this.listLoading = true;
+      var Url = "/yanghua_edu/api/project_module/service_content/";
+      getsNews(Url, { id: id }).then(res => {
+        this.listLoading = false;
+        // console.log(res);
+        if (res.code == "1") {
+          this.dialogTableVisible2 = true;
+          this.title = "编辑";
+          this.type = "edit";
+          this.msg1 = res.data;
+          this.isshows = true;
+          this.content = res.data.content;
+        } else {
+          this.listLoading = false;
+          this.$message({
+            message: res.msg,
+            type: "error"
+          });
+        }
+      });
+    },
     // 新增员工
     addNew() {
       this.msg1 = {};
       this.title = "新增";
       this.type = "add";
       this.dialogTableVisible2 = true;
+      this.isshows = true;
+      this.content = "";
     },
 
     // 修改
