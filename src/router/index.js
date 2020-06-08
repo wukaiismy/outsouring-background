@@ -80,6 +80,12 @@ export const constantRouterMap = [
         name: "Notify",
         component: () => import("@/views/banner/Notify"),
         meta: { title: "通知公告", icon: "tree" }
+      },
+      {
+        path: "LittleModles",
+        name: "LittleModles",
+        component: () => import("@/views/banner/LittleModles"),
+        meta: { title: "小模块", icon: "tree" }
       }
     ]
   },

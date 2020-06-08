@@ -13,27 +13,28 @@
         highlight-current-row
         style="width:100%;"
       >
-        <el-table-column label="创建时间" align="center">
+        <el-table-column label="id" align="center" width="60">
           <template slot-scope="scope">
-            <span>{{scope.row.create_time|timeType}}</span>
+            <span>{{scope.row.id}}</span>
           </template>
         </el-table-column>
-        <el-table-column property="name" label="服务点名称" align="center"></el-table-column>
-        <el-table-column property="address" label="省市县" align="center"></el-table-column>
-        <el-table-column property="detailed_address" label="详细地址" align="center"></el-table-column>
-        <el-table-column property="postal_no" label="邮编" align="center"></el-table-column>
-        <el-table-column property="work_hours" label="工作时间" align="center"></el-table-column>
-        <el-table-column property="support_hotline" label="咨询电话" align="center"></el-table-column>
-        <el-table-column property="principal_name" label="负责人姓名" align="center"></el-table-column>
-        <el-table-column property="principal_mobile" label="负责人电话" align="center"></el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column property="title" label="标题" align="center"></el-table-column>
+
+        <el-table-column property="url_path" label="跳转地址" align="center"></el-table-column>
+        <el-table-column label="图片" align="center">
+          <template slot-scope="scope">
+            <!-- <span>{{scope.row.image}}</span> -->
+            <img class="imgsss" :src="scope.row.image" alt />
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="120">
           <template slot-scope="scope">
             <el-button type="text" @click="edits(scope.row)">编辑</el-button>
-            <el-button type="text" @click="delNews(scope.row.id)">删除</el-button>
+            <!-- <el-button type="text" @click="delNews(scope.row.id)">删除</el-button> -->
           </template>
         </el-table-column>
       </el-table>
-      <el-button class="addBtn" type="primary" @click="addNew">新增项目</el-button>
+      <!-- <el-button class="addBtn" type="primary" @click="addNew">新增项目</el-button> -->
     </div>
     <!-- 分页功能 -->
     <div class="pagination-container">
@@ -55,37 +56,15 @@
       <div class="diaTilte">
         <div class="titleMotai">{{title}}</div>
         <el-form label-width="130px">
-          <el-form-item label="服务点名称">
-            <el-input style="width: 300px;" v-model="msg1.name"></el-input>
-          </el-form-item>
-          <el-form-item label="省市县">
-            <el-input style="width: 300px;" v-model="msg1.address"></el-input>
-          </el-form-item>
-          <el-form-item label="详细地址">
-            <el-input
-              type="textarea"
-              style="width: 300px;"
-              :rows="2"
-              v-model="msg1.detailed_address"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="邮编">
-            <el-input style="width: 300px;" v-model="msg1.postal_no"></el-input>
-          </el-form-item>
-          <el-form-item label="工作时间">
-            <el-input style="width: 300px;" v-model="msg1.work_hours"></el-input>
-          </el-form-item>
-          <el-form-item label="咨询电话">
-            <el-input style="width: 300px;" v-model="msg1.support_hotline"></el-input>
-          </el-form-item>
-          <el-form-item label="负责人姓名">
-            <el-input style="width: 300px;" v-model="msg1.principal_name"></el-input>
-          </el-form-item>
-          <el-form-item label="负责人电话">
-            <el-input style="width: 300px;" v-model="msg1.principal_mobile"></el-input>
+          <el-form-item label="标题">
+            <el-input style="width: 300px;" v-model="msg1.title"></el-input>
           </el-form-item>
 
-          <el-form-item label="服务点地图">
+          <el-form-item label="跳转地址">
+            <el-input style="width: 300px;" v-model="msg1.url_path"></el-input>
+          </el-form-item>
+
+          <el-form-item label="图片">
             <el-upload
               class="avatar-uploader"
               action="/api/banner_img/file_or_img/"
@@ -94,7 +73,7 @@
               :before-upload="beforeAvatarUpload"
             >
               <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-              <img v-else :src="msg1.address_map" class="avatar" alt="暂无图片" />
+              <img v-else :src="msg1.image" class="avatar" alt="暂无图片" />
             </el-upload>
           </el-form-item>
           <el-button type="primary" @click="submitForm()">保存</el-button>
@@ -110,7 +89,7 @@ import Search from "../jionUs/components/Search";
 import { updataImg } from "@/api/table";
 import { showCm, markCm, editCm, delNews } from "@/api/news";
 export default {
-  name: "ServicePoint",
+  name: "LittleModles",
 
   data() {
     return {
@@ -175,15 +154,15 @@ export default {
       this.listLoading = true;
 
       var basicURL =
-        "/yanghua_edu/api/service_point/service_point/?pg=" +
+        "/yanghua_edu/api/other_module/home_small/?pg=" +
         this.pages.page +
         "&size=" +
         this.pages.size;
       showCm(basicURL).then(res => {
-        console.log("服务中心");
+        console.log("小模块");
         console.log(res);
         if (res.code == 1) {
-          var dataList = res.data.ret;
+          var dataList = res.data;
           console.log(dataList);
 
           this.total = res.data.count;
@@ -213,7 +192,7 @@ export default {
       var data = {
         id: val
       };
-      var url = "/yanghua_edu/api/service_point/service_point/";
+      var url = "/yanghua_edu/api/learning_platform/learn_plat/";
       delNews(url, data).then(res => {
         console.log(res);
         this.message(res.msg, res.code);
@@ -239,17 +218,19 @@ export default {
 
     // 修改
     submitForm() {
-      var methodsType = "put";
+      var methodsType = "post";
       if (this.type == "add") {
         methodsType = "post";
         // this.msg1.images = this.imageUrl;
       }
       console.log(this.msg1);
       if (this.imageUrl) {
-        this.msg1.address_map = this.imageUrl;
+        this.msg1.image = this.imageUrl;
       }
+      console.log("+_++++++++");
+      console.log(this.msg1);
 
-      var url = "/yanghua_edu/api/service_point/service_point/";
+      var url = "/yanghua_edu/api/other_module/home_small/";
       editCm(methodsType, url, this.msg1).then(res => {
         console.log(res);
         if (res.code == "1") {
@@ -508,5 +489,9 @@ export default {
 <style lang="scss">
 .el-form-item__content {
   text-align: left;
+}
+.imgsss {
+  width: 40px;
+  height: 40px;
 }
 </style>
